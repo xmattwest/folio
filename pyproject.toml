@@ -1,0 +1,24 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "folio"
+version = "0.1.0"
+description = "Claim-verified multi-surface research compiler for web preprints, visual monographs, Substack essays, and X articles."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.11"
+authors = [
+    { name = "xmattwest" },
+]
+dependencies = []
+
+[project.scripts]
+folio = "folio.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/folio"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
