@@ -447,7 +447,7 @@ tables = ["t1"]
 
     zen = json.loads((out / "syndication" / ".zenodo.json").read_text(encoding="utf-8"))
     assert zen["creators"][0]["orcid"] == "0000-0002-1825-0097"
-    assert any(r["resource_type"] == "model" for r in zen["related_identifiers"])
+    assert any(r["identifier"].endswith("/model-compact") for r in zen["related_identifiers"])
 
     hf_card = (out / "syndication" / "hf_README.md").read_text(encoding="utf-8")
     assert "base_model: google/gemma-4-31B-it" in hf_card

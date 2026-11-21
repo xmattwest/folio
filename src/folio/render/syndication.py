@@ -141,7 +141,7 @@ def render_zenodo_json(resolved: ResolvedManuscript) -> str:
         related.append({
             "identifier": meta.hf_model_url,
             "relation": "isSupplementedBy",
-            "resource_type": "model",
+            "resource_type": "other",
         })
     if meta.hf_dataset_url:
         related.append({
