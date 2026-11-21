@@ -6,6 +6,7 @@
 2. **`monograph` (Visual Research Essay):** Narrative thesis headings, bespoke inline semantic `<svg>` diagrams, and collapsible `<details><summary>Text alternative and data</summary>` tables beneath every visual.
 3. **`substack` (Substack Paste-Ready Package):** `680px` Charter HTML plus deterministic `2x` Retina PNGs (with zero inline `<svg>` or `<details>` tags).
 4. **`x-article` (X Long-Form Article + Card Kit):** Mobile-first beats, clean Unicode math/comparisons (no broken LaTeX), and high-DPI `16:9` / `4:3` Dawn State PNG cards.
+5. **`syndication` (Scholar, Zenodo, Hugging Face & Agent Discovery Kit):** Emits a clean RAG/LLM Markdown twin (`index.md`), turnkey DataCite/OAI-PMH deposit record (`.zenodo.json`), Hugging Face Hub Model/Dataset Card stub (`hf_README.md` with `base_model:` YAML frontmatter), and Highwire/Google Scholar `citation_pdf_url`, `citation_doi`, and `citation_author_orcid` metadata.
 
 ## Core Subsystems
 

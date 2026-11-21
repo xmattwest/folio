@@ -194,6 +194,14 @@ class DocumentMeta:
     part1_label: str = "Part 1"
     substack_tables: bool = False
     allow_numbers: tuple[str, ...] = ()
+    orcid: str = ""
+    doi: str = ""
+    pdf_url: str = ""
+    markdown_url: str = ""
+    seo_title: str = ""
+    hf_model_url: str = ""
+    hf_dataset_url: str = ""
+    base_model: str = ""
 
 
 @dataclass(frozen=True)
@@ -334,6 +342,14 @@ def load_manifest(manifest_path: Path) -> ManuscriptIR:
         part1_label=str(meta_raw.get("part1_label", "Part 1")),
         substack_tables=bool(meta_raw.get("substack_tables", False)),
         allow_numbers=tuple(str(x) for x in meta_raw.get("allow_numbers", [])),
+        orcid=str(meta_raw.get("orcid", "")),
+        doi=str(meta_raw.get("doi", "")),
+        pdf_url=str(meta_raw.get("pdf_url", "")),
+        markdown_url=str(meta_raw.get("markdown_url", "")),
+        seo_title=str(meta_raw.get("seo_title", "")),
+        hf_model_url=str(meta_raw.get("hf_model_url", "")),
+        hf_dataset_url=str(meta_raw.get("hf_dataset_url", "")),
+        base_model=str(meta_raw.get("base_model", "")),
     )
 
     artifacts: dict[str, ArtifactSpec] = {}

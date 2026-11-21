@@ -390,3 +390,74 @@ figures = ["hero_anim"]
     assert "87.1\u00b0" in mono
 
 
+def test_syndication_target_and_scholar_metadata(tmp_path: Path) -> None:
+    import json
+
+    (tmp_path / "r.json").write_text('{"gain": 25.8}', encoding="utf-8")
+    m = tmp_path / "syn.toml"
+    m.write_text(
+        """
+[meta]
+title = "Syndication Study"
+subtitle = "Testing automated Scholar, Zenodo, and Hugging Face metadata."
+author = "Example Researcher"
+date = "2026-11-20"
+iso_date = "2026-11-20"
+orcid = "https://orcid.org/0000-0002-1825-0097"
+doi = "10.5281/zenodo.1234567"
+canonical_url = "https://example.org/pubs/syndication-study/"
+repo_url = "https://github.com/example/syndication-study"
+hf_model_url = "https://huggingface.co/example/model-compact"
+hf_dataset_url = "https://huggingface.co/datasets/example/bench"
+base_model = "google/gemma-4-31B-it"
+keywords = ["looped transformers", "mechanistic interpretability"]
+abstract = "Achieved {{gain}} accuracy."
+
+[artifacts.r]
+path = "r.json"
+
+[metrics.gain]
+pointer = "r#/gain"
+tier = "primary"
+style = "percent"
+decimals = 1
+
+[[tables]]
+id = "t1"
+title = "Summary scorecard"
+headers = ["Model", "Accuracy"]
+rows = [["Compact", "{{gain}}"]]
+
+[[sections]]
+id = "s1"
+preprint_title = "Results"
+monograph_title = "Main finding"
+paragraphs = ["Accuracy reached {{gain}}."]
+tables = ["t1"]
+""",
+        encoding="utf-8",
+    )
+    out = tmp_path / "out_syn"
+    assert cli_main(["build", str(m), "--out", str(out), "--no-raster"]) == 0
+
+    md_twin = (out / "syndication" / "index.md").read_text(encoding="utf-8")
+    assert 'orcid: "https://orcid.org/0000-0002-1825-0097"' in md_twin
+    assert 'doi: "10.5281/zenodo.1234567"' in md_twin
+    assert "| Compact | 25.8% |" in md_twin
+
+    zen = json.loads((out / "syndication" / ".zenodo.json").read_text(encoding="utf-8"))
+    assert zen["creators"][0]["orcid"] == "0000-0002-1825-0097"
+    assert any(r["resource_type"] == "model" for r in zen["related_identifiers"])
+
+    hf_card = (out / "syndication" / "hf_README.md").read_text(encoding="utf-8")
+    assert "base_model: google/gemma-4-31B-it" in hf_card
+    assert "25.8%" in hf_card
+
+    mono = (out / "monograph" / "index.html").read_text(encoding="utf-8")
+    assert 'citation_pdf_url" content="https://example.org/pubs/syndication-study/paper.pdf"' in mono
+    assert 'citation_doi" content="10.5281/zenodo.1234567"' in mono
+    assert 'citation_author_orcid" content="https://orcid.org/0000-0002-1825-0097"' in mono
+    assert 'type="text/markdown"' in mono
+
+
+

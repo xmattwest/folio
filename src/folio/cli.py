@@ -13,15 +13,18 @@ from folio.figures.raster import rasterize_figure_png, resolve_chrome_bin
 from folio.guard import audit_repo
 from folio.ir import IRError, load_manifest, resolve_manuscript
 from folio.render import (
+    render_hf_card_md,
+    render_markdown_twin,
     render_monograph,
     render_preprint,
     render_shelltoho_source,
     render_substack,
     render_x_article,
+    render_zenodo_json,
 )
 from folio.verify import verify_manuscript
 
-ALL_TARGETS = ("preprint", "monograph", "substack", "x-article")
+ALL_TARGETS = ("preprint", "monograph", "substack", "x-article", "syndication")
 
 STARTER_MANIFEST = """# Folio canonical research manifest
 base_dir = "."
@@ -209,6 +212,17 @@ def _cmd_build(
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_text(render_x_article(resolved, x_pngs), encoding="utf-8")
         emitted.append(str(p))
+
+    if "syndication" in targets:
+        syn_dir = out_dir / "syndication"
+        syn_dir.mkdir(parents=True, exist_ok=True)
+        md_p = syn_dir / "index.md"
+        md_p.write_text(render_markdown_twin(resolved), encoding="utf-8")
+        zen_p = syn_dir / ".zenodo.json"
+        zen_p.write_text(render_zenodo_json(resolved), encoding="utf-8")
+        hf_p = syn_dir / "hf_README.md"
+        hf_p.write_text(render_hf_card_md(resolved), encoding="utf-8")
+        emitted.extend([str(md_p), str(zen_p), str(hf_p)])
 
     # Write provenance lockfile
     lock = {

@@ -78,16 +78,27 @@ def render_seo_head_html(
     # Highwire Press / Google Scholar / Semantic Scholar metadata
     tags.append(f'<meta name="citation_title" content="{esc(page_title)}">')
     tags.append(f'<meta name="citation_author" content="{esc(meta.author)}">')
+    if meta.orcid:
+        tags.append(f'<meta name="citation_author_orcid" content="{esc(meta.orcid)}">')
     cite_date = (meta.iso_date or meta.date).replace("-", "/")
     if cite_date:
         tags.append(f'<meta name="citation_publication_date" content="{esc(cite_date)}">')
     if url:
         tags.append(f'<meta name="citation_fulltext_html_url" content="{esc(url)}">')
+    resolved_pdf = meta.pdf_url or (f"{url.rstrip('/')}/paper.pdf" if url else "")
+    if resolved_pdf:
+        tags.append(f'<meta name="citation_pdf_url" content="{esc(resolved_pdf)}">')
+    if meta.doi:
+        tags.append(f'<meta name="citation_doi" content="{esc(meta.doi)}">')
+    resolved_md = meta.markdown_url or (f"{url.rstrip('/')}/index.md" if url else "")
+    if resolved_md:
+        tags.append(f'<link rel="alternate" type="text/markdown" href="{esc(resolved_md)}" title="Markdown version">')
 
     # Open Graph & Twitter card metadata
+    display_og_title = meta.seo_title or f"{page_title} | {meta.author}"
     tags.append('<meta property="og:site_name" content="shelltoho.me">')
     tags.append('<meta property="og:type" content="article">')
-    tags.append(f'<meta property="og:title" content="{esc(page_title)} | {esc(meta.author)}">')
+    tags.append(f'<meta property="og:title" content="{esc(display_og_title)}">')
     tags.append(f'<meta property="og:description" content="{esc(description)}">')
     if url:
         tags.append(f'<meta property="og:url" content="{esc(url)}">')
@@ -98,7 +109,7 @@ def render_seo_head_html(
     if meta.og_image:
         tags.append(f'<meta property="og:image" content="{esc(meta.og_image)}">')
     tags.append('<meta name="twitter:card" content="summary_large_image">')
-    tags.append(f'<meta name="twitter:title" content="{esc(page_title)} | {esc(meta.author)}">')
+    tags.append(f'<meta name="twitter:title" content="{esc(display_og_title)}">')
     tags.append(f'<meta name="twitter:description" content="{esc(description)}">')
     if meta.og_image:
         tags.append(f'<meta name="twitter:image" content="{esc(meta.og_image)}">')
@@ -141,8 +152,19 @@ def render_seo_head_html(
             "name": meta.part1_label,
             "url": meta.part1_url,
         }
+    same_as_links = [
+        u for u in (meta.repo_url, meta.hf_model_url, meta.hf_dataset_url) if u
+    ]
+    if same_as_links:
+        ld["sameAs"] = same_as_links
     if meta.repo_url:
-        ld["sameAs"] = [meta.repo_url]
+        ld["codeRepository"] = meta.repo_url
+    if resolved_pdf:
+        ld["encoding"] = {
+            "@type": "MediaObject",
+            "contentUrl": resolved_pdf,
+            "encodingFormat": "application/pdf",
+        }
 
     ld_json = json.dumps(ld, ensure_ascii=False).replace("<", "\\u003c")
     tags.append(f'<script type="application/ld+json">{ld_json}</script>')
