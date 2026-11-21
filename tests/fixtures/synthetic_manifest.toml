@@ -1,0 +1,229 @@
+base_dir = "."
+
+[meta]
+title = "Protected-Boundary Sparsity Cuts Divergence on Synthetic Benchmarks"
+subtitle = "Budget-matched activation pruning and mid-stack looping on a synthetic model."
+preprint_title = "Protected-Boundary Sparsity and Mid-Stack Looping in Synthetic-Model-7B"
+monograph_title = "Where a synthetic network keeps its work"
+substack_title_alt = "Inside the Synthetic Bottleneck"
+author = "Test Author"
+date = "20 Nov 2026"
+wordmark = "folio."
+abstract = "Allocating activation budget to the mid-stack lowers held-out KL divergence by {{kl_pct_drop}} ({{kl_hourglass}} vs. {{kl_uniform}}). Two-pass looping lifts accuracy from {{k1_acc}} to {{k2_acc}} ({{k2_ratio}})."
+lede = "Moving sparse capacity from outer corridors into the mid-stack cuts divergence by {{kl_pct_drop}} at identical compute."
+opening_summary = [
+  "Protected-boundary sparsity lowers KL divergence to {{kl_hourglass}}, beating uniform pruning ({{kl_uniform}}) by {{kl_pct_drop}}.",
+  "Two-pass mid-stack looping lifts held-out accuracy to {{k2_acc}} ({{k2_ratio}} over one pass)."
+]
+x_hook = "Moving activation budget into the mid-stack cuts KL divergence by {{kl_pct_drop}} ({{kl_hourglass}} vs. {{kl_uniform}}) at identical compute."
+ai_disclosure = "All numbers in this synthetic test document bind to JSON pointers."
+repo_url = "https://github.com/example/synthetic-study"
+
+[artifacts.syn]
+path = "synthetic_results.json"
+
+[metrics.kl_uniform]
+pointer = "syn#/sparsity/uniform_kl"
+tier = "primary"
+decimals = 4
+unit = "nats"
+
+[metrics.kl_hourglass]
+pointer = "syn#/sparsity/hourglass_kl"
+tier = "primary"
+decimals = 4
+unit = "nats"
+
+[metrics.kl_anti]
+pointer = "syn#/sparsity/anti_hourglass_kl"
+tier = "primary"
+decimals = 4
+unit = "nats"
+
+[metrics.kl_pct_drop]
+derive = "pct_change"
+inputs = ["kl_uniform", "kl_hourglass"]
+tier = "primary"
+style = "percent"
+decimals = 1
+signed = true
+
+[metrics.k1_acc]
+pointer = "syn#/looping/k1_acc"
+tier = "primary"
+style = "percent"
+decimals = 1
+
+[metrics.k2_acc]
+pointer = "syn#/looping/k2_acc"
+tier = "primary"
+style = "percent"
+decimals = 1
+
+[metrics.k4_acc]
+pointer = "syn#/looping/k4_acc"
+tier = "primary"
+style = "percent"
+decimals = 1
+
+[metrics.k2_ratio]
+derive = "ratio"
+inputs = ["k2_acc", "k1_acc"]
+tier = "primary"
+style = "ratio"
+decimals = 1
+
+[metrics.untrained_k5_acc]
+pointer = "syn#/looping/untrained_k5_acc"
+tier = "negative"
+style = "percent"
+decimals = 1
+caveat = "Untrained K=5 extrapolation drifts off-manifold and fails to improve over K=1."
+
+[[equations]]
+id = "recurrence"
+latex = "H_{24}^{(k+1)} = (1 - g) H_{24}^{(0)} + g \\cdot R H_{42}^{(k)}"
+unicode = "H_24^(k+1) = (1 − g) H_24^(0) + g · R H_42^(k)"
+label = "1"
+
+[[figures]]
+id = "sparsity_bars"
+kind = "bar"
+title = "Protected-boundary sparsity lowers KL divergence by {{kl_pct_drop}} against uniform pruning"
+subtitle = "Held-out KL divergence (nats, lower is better) at matched global activation budget"
+source = "Source: synthetic_results.json."
+alt = "Horizontal bar chart showing hourglass sparsity at {{kl_hourglass}}, uniform at {{kl_uniform}}, and anti-hourglass at {{kl_anti}}."
+categories = ["Hourglass (mid-stack)", "Uniform flat", "Anti-hourglass"]
+y_unit = "nats"
+y_decimals = 3
+focus_index = 0
+card_aspect = "16:9"
+
+  [[figures.series]]
+  label = "KL divergence"
+  role = "primary"
+  values = ["{{kl_hourglass}}", "{{kl_uniform}}", "{{kl_anti}}"]
+
+[[figures]]
+id = "loop_scaling"
+kind = "line"
+title = "Mid-stack looping lifts held-out accuracy to {{k2_acc}} at two passes"
+subtitle = "Exact-match accuracy (%) across loop depth K=1..4 on synthetic tasks"
+source = "Source: synthetic_results.json."
+alt = "Line chart showing accuracy rising from {{k1_acc}} at K=1 to {{k2_acc}} at K=2 and {{k4_acc}} at K=4."
+categories = ["K=1", "K=2", "K=4"]
+y_unit = "%"
+y_decimals = 1
+card_aspect = "4:3"
+
+  [[figures.series]]
+  label = "Accuracy"
+  role = "focus"
+  values = ["{{k1_acc}}", "{{k2_acc}}", "{{k4_acc}}"]
+
+[[figures]]
+id = "funnel_schematic"
+kind = "schematic"
+title = "Outer corridors feed a shared mid-stack bottleneck with anchored recurrence"
+subtitle = "Block diagram of prelude, recurrent funnel, and coda stages"
+source = "Source: synthetic architecture spec."
+alt = "Three connected blocks showing prelude layers feeding a highlighted mid-stack funnel with a feedback loop."
+card_aspect = "16:9"
+
+  [[figures.nodes]]
+  id = "prelude"
+  label = "Outer Corridor"
+  sublabel = "Sparse lookup"
+  x = 40
+  y = 80
+  w = 200
+  h = 88
+  role = "well"
+
+  [[figures.nodes]]
+  id = "funnel"
+  label = "Mid-Stack Funnel"
+  sublabel = "KL {{kl_hourglass}}"
+  x = 320
+  y = 80
+  w = 210
+  h = 88
+  role = "focus"
+
+  [[figures.nodes]]
+  id = "coda"
+  label = "Coda"
+  sublabel = "Logit decode"
+  x = 610
+  y = 80
+  w = 190
+  h = 88
+  role = "structure"
+
+  [[figures.edges]]
+  from = "prelude"
+  to = "funnel"
+  label = "H_24^(0)"
+
+  [[figures.edges]]
+  from = "funnel"
+  to = "coda"
+  label = "H_42^(K)"
+
+  [[figures.edges]]
+  from = "funnel"
+  to = "funnel"
+  loop_back = true
+  label = "Procrustes Bridge"
+
+[[tables]]
+id = "sparsity_table"
+title = "Budget-matched sparsity schedules on Synthetic-Model-7B"
+subtitle = "Held-out KL divergence in nats (lower is better)"
+source = "Source: synthetic_results.json."
+headers = ["Schedule", "Held-Out KL"]
+rows = [
+  ["Hourglass", "{{kl_hourglass}}"],
+  ["Uniform flat", "{{kl_uniform}}"],
+  ["Anti-hourglass", "{{kl_anti}}"]
+]
+highlight_row = 0
+right_align_cols = [1]
+
+[[sections]]
+id = "sparsity"
+preprint_title = "Protected-Boundary Sparsity"
+monograph_title = "Preserving the mid-stack cuts divergence"
+paragraphs = [
+  "Concentrating active neurons in the mid-stack lowers KL divergence from {{kl_uniform}} to {{kl_hourglass}} ({{kl_pct_drop}}). Starving the mid-stack raises divergence to {{kl_anti}}."
+]
+figures = ["sparsity_bars", "funnel_schematic"]
+tables = ["sparsity_table"]
+
+[[sections]]
+id = "looping"
+preprint_title = "Mid-Stack Recurrence"
+monograph_title = "Looping the bottleneck scales accuracy"
+paragraphs = [
+  "Anchored recurrence raises held-out accuracy from {{k1_acc}} to {{k2_acc}} ({{k2_ratio}})."
+]
+equations = ["recurrence"]
+figures = ["loop_scaling"]
+
+[[sections]]
+id = "negative_extrap"
+preprint_title = "Untrained Extrapolation Limit"
+monograph_title = "Where untrained looping stops working"
+tier = "negative"
+caveat = "This section reports an explicit negative boundary result on untrained depth extrapolation."
+paragraphs = [
+  "Running five loops without training drops accuracy to {{untrained_k5_acc}}."
+]
+
+[[citations]]
+key = "syn2026"
+authors = "Example Authors"
+year = "2026"
+title = "Synthetic Reference Study"
+venue = "arXiv"
+url = "https://arxiv.org/abs/0000.00000"

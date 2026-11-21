@@ -1,0 +1,17 @@
+{
+  "metadata": {
+    "model": "Synthetic-Model-7B",
+    "n_items": 120
+  },
+  "sparsity": {
+    "uniform_kl": 0.8800,
+    "hourglass_kl": 0.7040,
+    "anti_hourglass_kl": 1.4080
+  },
+  "looping": {
+    "k1_acc": 12.5,
+    "k2_acc": 25.0,
+    "k4_acc": 22.5,
+    "untrained_k5_acc": 1.5
+  }
+}
