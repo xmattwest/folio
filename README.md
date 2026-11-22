@@ -1,6 +1,6 @@
 # Folio
 
-**Author:** [Matt West](https://shelltoho.me/) ([Google Scholar](https://scholar.google.com/citations?user=khPjLQcAAAAJ&hl=en) · [GitHub](https://github.com/xmattwest) · [Hugging Face](https://huggingface.co/mattyxcakes) · [ORCID](https://orcid.org/0009-0008-5557-9394) · [X](https://x.com/xmattwest))
+**Author:** [Matt West](https://shelltoho.me/) ([Google Scholar](https://scholar.google.com/citations?user=khPjLQcAAAAJ&hl=en) · [GitHub](https://github.com/xmattwest) · [Hugging Face](https://huggingface.co/xmattwest) · [ORCID](https://orcid.org/0009-0008-5557-9394) · [X](https://x.com/xmattwest))
 
 **Folio** is a standalone, project-agnostic, claim-verified research compiler. Point it at any external experimental repository to verify every quantitative claim against upstream JSON artifacts and compile four synchronized Dawn State / Warm Precision publication surfaces:
 
